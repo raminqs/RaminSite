@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dr. Ramin Ghiasi — AI for Structural Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --bg-soft: #0f1730;
+    --panel: #111a35;
+    --line: rgba(0, 212, 255, 0.18);
+    --accent: #00d4ff;
+    --accent-soft: rgba(0, 212, 255, 0.12);
+    --accent-glow: rgba(0, 212, 255, 0.45);
+    --text: #e8edf7;
+    --muted: #8b97b5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: -2px;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridShift 20s linear infinite;
+    z-index: 0;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+  }
+
+  @keyframes gridShift {
+    0%   { background-position: 0 0, 0 0; }
+    100% { background-position: 60px 60px, 60px 60px; }
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(0, 212, 255, 0.18), transparent 35%),
+      radial-gradient(circle at 85% 80%, rgba(120, 90, 255, 0.15), transparent 40%);
+    animation: orbs 12s ease-in-out infinite alternate;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  @keyframes orbs {
+    0%   { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 1;   transform: scale(1.05); }
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  nav {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  nav .brand { color: var(--accent); letter-spacing: 0.08em; }
+  nav .brand::before { content: '> '; opacity: 0.7; }
+  nav .meta { color: var(--muted); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 90px 0 100px;
+    position: relative;
+  }
+
+  .hero-inner {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  .hero-text {
+    flex: 0 0 auto;
+    width: 500px;
+    max-width: 48%;
+  }
+
+  .hero-illustration {
+    flex: 1;
+    min-width: 0;
+  }
+  .hero-illustration svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 0 60px rgba(0,212,255,0.1));
+  }
+
+  .social-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 32px;
+  }
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--muted);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .social-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+  }
+  .social-icon { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
+  .social-rg {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .hero .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    padding: 8px 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--accent-soft);
+  }
+  .hero .tag::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.35; }
+  }
+
+  .hero h1 {
+    font-size: clamp(40px, 5.5vw, 92px);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    background: linear-gradient(180deg, #ffffff 30%, #6f8cb8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(120deg, var(--accent) 0%, #7df9ff 50%, #b6f4ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero .role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+  .hero .role span { color: var(--accent); }
+
+  .hero .tagline {
+    font-size: clamp(17px, 2vw, 22px);
+    max-width: 600px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  .hero .tagline strong { color: var(--accent); font-weight: 700; }
+
+  /* Avatar (in About section) */
+  .about-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 64px;
+  }
+  .about-text { flex: 1; min-width: 0; }
+  .about-text h2 { margin-bottom: 24px; }
+
+  .avatar-wrap {
+    flex-shrink: 0;
+    width: 220px;
+    height: 220px;
+    position: relative;
+  }
+  .avatar-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(var(--accent), #7b5cff, #00d4ff);
+    animation: spin 7s linear infinite;
+    z-index: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .avatar-glow {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,255,0.18) 0%, transparent 70%);
+    animation: orbs 4s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+  .avatar {
+    position: absolute;
+    inset: 4px;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    background: var(--panel);
+    border: 3px solid var(--bg);
+    z-index: 1;
+    display: block;
+  }
+
+  /* ── SECTIONS ── */
+  section.block {
+    padding: 90px 0;
+    border-top: 1px solid var(--line);
+    position: relative;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .label::before {
+    content: '';
+    width: 28px;
+    height: 1px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+
+  h2 {
+    font-size: clamp(30px, 4.5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 40px;
+    max-width: 800px;
+  }
+
+  /* About */
+  .about p {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 760px;
+    margin-bottom: 18px;
+  }
+  .about p strong { color: var(--text); font-weight: 600; }
+
+  /* ── SHM VISUALIZATION ── */
+  .shm-viz {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 40px 36px 36px;
+    overflow: hidden;
+  }
+  .shm-viz .viz-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 28px;
+  }
+  .shm-svg-wrap {
+    width: 100%;
+    margin-bottom: 36px;
+  }
+  .shm-svg-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  .flow-pipeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    position: relative;
+  }
+  .flow-pipeline::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.25;
+  }
+  .flow-step { text-align: center; padding: 0 6px; }
+  .flow-step .step-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .flow-step:hover .step-icon {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  .flow-step .step-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .flow-step .step-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── RESEARCH CHIPS ── */
+  .research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .chip {
+    position: relative;
+    padding: 22px 22px 22px 24px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    overflow: hidden;
+  }
+  .chip::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+    opacity: 0.6;
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .chip:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.15);
+  }
+  .chip .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.14em;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .chip .title { font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.3; }
+
+  /* ── PAPERS ── */
+  .papers-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .paper-card {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 22px 26px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .paper-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent);
+    opacity: 0.55;
+  }
+  .paper-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.12);
+  }
+
+  .cite-badge {
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(0, 212, 255, 0.22);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .cite-badge .cite-n {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .cite-badge .cite-l {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .paper-info { flex: 1; min-width: 0; }
+  .paper-info .p-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 7px;
+  }
+  .paper-info .p-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .paper-arrow {
+    flex-shrink: 0;
+    color: var(--muted);
+    font-size: 18px;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .paper-card:hover .paper-arrow { color: var(--accent); transform: translateX(4px); }
+
+  /* ── VIDEOS ── */
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 28px;
+  }
+  .video-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .video-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 40px rgba(0, 212, 255, 0.15);
+  }
+  .video-embed { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+  .video-embed iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: 0;
+  }
+  .video-meta { padding: 20px 24px; }
+  .video-meta .vid-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .video-meta .vid-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  .video-meta .vid-sub { font-size: 13px; color: var(--muted); margin-top: 5px; }
+
+  /* ── EVENTS ── */
+  .events-list { display: flex; flex-direction: column; gap: 16px; }
+
+  .event-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 28px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .event-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: #7b5cff;
+    opacity: 0.7;
+  }
+  .event-card:hover {
+    border-color: #7b5cff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(123, 92, 255, 0.15);
+  }
+
+  .event-date {
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    background: rgba(123, 92, 255, 0.12);
+    border: 1px solid rgba(123, 92, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .event-date .ev-day {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: #a78bfa;
+    line-height: 1;
+  }
+  .event-date .ev-mon {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .event-info { flex: 1; min-width: 0; }
+  .event-info .ev-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: #a78bfa;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .event-info .ev-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+  .event-info .ev-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .event-arrow {
+    flex-shrink: 0;
+    color: var(--muted);
+    font-size: 18px;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .event-card:hover .event-arrow { color: #a78bfa; transform: translateX(4px); }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 12px; bottom: 12px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--accent), transparent);
+  }
+  .step { position: relative; padding: 18px 0 18px 28px; }
+  .step::before {
+    content: '';
+    position: absolute;
+    left: -8px; top: 24px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .step .when {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .step .where { font-size: 19px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step .what { color: var(--muted); font-size: 15px; }
+
+  /* ── CONTACT ── */
+  .contact-card {
+    background: linear-gradient(135deg, var(--panel) 0%, var(--bg-soft) 100%);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 56px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-card::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: conic-gradient(from 0deg, transparent, var(--accent-glow), transparent 30%);
+    animation: rotate 8s linear infinite;
+    opacity: 0.25;
+  }
+  .contact-card::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    background: linear-gradient(135deg, var(--panel) 0%, var(--bg-soft) 100%);
+    border-radius: 19px;
+  }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+  .contact-card > * { position: relative; z-index: 1; }
+  .contact-card h3 {
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+  .contact-card p { color: var(--muted); margin-bottom: 32px; font-size: 17px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 32px;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    border-radius: 10px;
+    letter-spacing: 0.02em;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.35);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0, 212, 255, 0.55); }
+  .btn .arrow { font-family: 'JetBrains Mono', monospace; transition: transform 0.2s; }
+  .btn:hover .arrow { transform: translateX(4px); }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 40px 32px 60px;
+    max-width: 1100px;
+    margin: 60px auto 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── TABLET ── */
+  @media (max-width: 900px) {
+    .hero-inner { flex-direction: column; gap: 32px; }
+    .hero-text { width: 100%; max-width: 100%; }
+    .hero-illustration { width: 100%; max-width: 480px; align-self: center; }
+    .about-inner { flex-direction: column-reverse; gap: 36px; align-items: flex-start; }
+    .avatar-wrap { width: 160px; height: 160px; align-self: center; }
+    .videos-grid { grid-template-columns: 1fr; }
+    .flow-pipeline { grid-template-columns: repeat(3, 1fr); row-gap: 24px; }
+    .flow-pipeline::before { display: none; }
+    h2 { margin-bottom: 28px; }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 640px) {
+    nav { padding: 18px 20px; }
+    nav .meta { display: none; }
+    nav .brand { font-size: 12px; }
+
+    main { padding: 0 18px; }
+
+    .hero { padding: 50px 0 60px; }
+    .hero-illustration { max-width: 360px; }
+    .about-inner { gap: 28px; }
+    .avatar-wrap { width: 130px; height: 130px; align-self: center; }
+    .hero .tag { font-size: 11px; padding: 6px 12px; margin-bottom: 20px; }
+    .hero .role { font-size: 13px; margin-bottom: 20px; }
+    .hero .tagline { font-size: 16px; }
+
+    section.block { padding: 50px 0; }
+
+    .about p { font-size: 16px; }
+
+    .shm-viz { padding: 24px 18px 24px; border-radius: 14px; }
+    .shm-svg-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .shm-svg-wrap svg { min-width: 560px; }
+    .flow-pipeline { grid-template-columns: repeat(2, 1fr); row-gap: 20px; }
+    .flow-step .step-icon { width: 46px; height: 46px; font-size: 18px; }
+    .flow-step .step-name { font-size: 12px; }
+    .flow-step .step-sub { font-size: 9px; }
+
+    .research-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .chip { padding: 16px 14px 16px 16px; }
+    .chip .title { font-size: 14px; }
+
+    .paper-card { padding: 16px 16px 16px 20px; gap: 12px; flex-wrap: wrap; }
+    .cite-badge { width: 56px; height: 56px; border-radius: 10px; }
+    .cite-badge .cite-n { font-size: 17px; }
+    .paper-info .p-title { font-size: 14px; }
+    .paper-info .p-meta { font-size: 10px; }
+    .paper-arrow { display: none; }
+
+    .videos-grid { gap: 18px; }
+    .video-meta { padding: 14px 16px; }
+    .video-meta .vid-title { font-size: 14px; }
+
+    .step .where { font-size: 16px; }
+
+    .contact-card { padding: 36px 20px; border-radius: 16px; }
+    .contact-card h3 { font-size: 22px; }
+    .contact-card p { font-size: 15px; margin-bottom: 24px; }
+    .btn { padding: 14px 22px; font-size: 14px; width: 100%; justify-content: center; }
+
+    footer { padding: 28px 20px 40px; flex-direction: column; gap: 8px; }
+  }
+
+  /* ── SMALL PHONES ── */
+  @media (max-width: 400px) {
+    .research-grid { grid-template-columns: 1fr; }
+    .flow-pipeline { grid-template-columns: repeat(2, 1fr); }
+    .avatar-wrap { width: 100px; height: 100px; }
+    .hero-content { padding: 80px 18px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">RG_// research lab</div>
+  <div class="meta">Dublin, Ireland &middot; v2026</div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="tag">Available for collaboration</div>
+        <h1>Ramin<br/><span class="accent">Ghiasi</span>, PhD</h1>
+        <div class="role">
+          Research Engineer <span>@</span> Roughan &amp; O'Donovan &nbsp;&middot;&nbsp; Intelligent Transport Systems
+        </div>
+        <p class="tagline">
+          Teaching <strong>machines to listen</strong> to bridges, railways and wind turbines &mdash;
+          turning sensor noise into structural insight with <strong>AI</strong> and <strong>signal intelligence</strong>.
+        </p>
+
+        <div class="social-row">
+          <a class="social-link" href="https://www.linkedin.com/in/ramin-ghiasi-b880ba54/" target="_blank" rel="noopener">
+            <svg class="social-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+          <a class="social-link" href="https://scholar.google.com/citations?user=vWSKP_YAAAAJ&hl=en" target="_blank" rel="noopener">
+            <svg class="social-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+            Google Scholar
+          </a>
+          <a class="social-link" href="https://www.researchgate.net/profile/Ramin-Ghiasi" target="_blank" rel="noopener">
+            <span class="social-rg">RG</span>
+            ResearchGate
+          </a>
+        </div>
+      </div>
+
+      <!-- SVG cityscape illustration — same color scheme as site -->
+      <div class="hero-illustration">
+        <svg viewBox="0 0 520 390" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="sg" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0d1a2e"/>
+              <stop offset="100%" stop-color="#060d1a"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Water -->
+          <rect x="0" y="268" width="520" height="50" fill="url(#wg)"/>
+          <path d="M 0 274 Q 65 269 130 274 Q 195 279 260 274 Q 325 269 390 274 Q 455 279 520 274" fill="none" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.2"/>
+          <path d="M 0 282 Q 80 278 160 282 Q 240 286 320 282 Q 400 278 480 282 Q 500 280 520 282" fill="none" stroke="#00d4ff" stroke-width="0.5" stroke-opacity="0.12"/>
+
+          <!-- City skyline — right side -->
+          <!-- B1 short -->
+          <rect x="295" y="232" width="20" height="60" rx="1" fill="#111a35" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.35"/>
+          <rect x="298" y="236" width="5" height="3" fill="#00d4ff" opacity="0.18"/>
+          <rect x="306" y="236" width="5" height="3" fill="#00d4ff" opacity="0.12"/>
+          <rect x="298" y="243" width="5" height="3" fill="#00d4ff" opacity="0.22"/>
+          <rect x="306" y="243" width="5" height="3" fill="#00d4ff" opacity="0.10"/>
+          <rect x="298" y="250" width="5" height="3" fill="#00d4ff" opacity="0.15"/>
+          <!-- B2 tall -->
+          <rect x="320" y="195" width="26" height="97" rx="1" fill="#111a35" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.4"/>
+          <rect x="323" y="200" width="5" height="3" fill="#00d4ff" opacity="0.25"/>
+          <rect x="332" y="200" width="5" height="3" fill="#00d4ff" opacity="0.14"/>
+          <rect x="323" y="208" width="5" height="3" fill="#00d4ff" opacity="0.18"/>
+          <rect x="332" y="208" width="5" height="3" fill="#00d4ff" opacity="0.28"/>
+          <rect x="323" y="216" width="5" height="3" fill="#00d4ff" opacity="0.12"/>
+          <rect x="332" y="216" width="5" height="3" fill="#00d4ff" opacity="0.20"/>
+          <rect x="323" y="224" width="5" height="3" fill="#00d4ff" opacity="0.22"/>
+          <rect x="332" y="232" width="5" height="3" fill="#00d4ff" opacity="0.16"/>
+          <!-- B2 antenna -->
+          <line x1="333" y1="195" x2="333" y2="180" stroke="#00d4ff" stroke-width="0.8" stroke-opacity="0.5"/>
+          <circle cx="333" cy="179" r="2" fill="#00d4ff" opacity="0.6"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.8s" repeatCount="indefinite"/></circle>
+          <!-- B3 medium -->
+          <rect x="352" y="210" width="24" height="82" rx="1" fill="#111a35" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.35"/>
+          <rect x="355" y="215" width="5" height="3" fill="#00d4ff" opacity="0.20"/>
+          <rect x="364" y="215" width="5" height="3" fill="#00d4ff" opacity="0.14"/>
+          <rect x="355" y="223" width="5" height="3" fill="#00d4ff" opacity="0.16"/>
+          <rect x="364" y="231" width="5" height="3" fill="#00d4ff" opacity="0.24"/>
+          <rect x="355" y="239" width="5" height="3" fill="#00d4ff" opacity="0.12"/>
+          <!-- B4 medium-wide -->
+          <rect x="382" y="218" width="30" height="74" rx="1" fill="#111a35" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.3"/>
+          <rect x="386" y="223" width="5" height="3" fill="#00d4ff" opacity="0.18"/>
+          <rect x="395" y="223" width="5" height="3" fill="#7b5cff" opacity="0.22"/>
+          <rect x="403" y="223" width="5" height="3" fill="#00d4ff" opacity="0.14"/>
+          <rect x="386" y="231" width="5" height="3" fill="#00d4ff" opacity="0.20"/>
+          <rect x="395" y="231" width="5" height="3" fill="#00d4ff" opacity="0.12"/>
+          <rect x="386" y="239" width="5" height="3" fill="#7b5cff" opacity="0.16"/>
+          <!-- B5 tall right -->
+          <rect x="418" y="188" width="22" height="104" rx="1" fill="#111a35" stroke="#7b5cff" stroke-width="0.4" stroke-opacity="0.4"/>
+          <rect x="421" y="193" width="5" height="3" fill="#7b5cff" opacity="0.22"/>
+          <rect x="430" y="193" width="5" height="3" fill="#7b5cff" opacity="0.16"/>
+          <rect x="421" y="201" width="5" height="3" fill="#00d4ff" opacity="0.18"/>
+          <rect x="430" y="201" width="5" height="3" fill="#7b5cff" opacity="0.24"/>
+          <rect x="421" y="209" width="5" height="3" fill="#7b5cff" opacity="0.14"/>
+          <rect x="430" y="217" width="5" height="3" fill="#00d4ff" opacity="0.20"/>
+          <!-- B5 antenna -->
+          <line x1="429" y1="188" x2="429" y2="170" stroke="#7b5cff" stroke-width="0.8" stroke-opacity="0.5"/>
+          <circle cx="429" cy="169" r="2" fill="#7b5cff" opacity="0.7"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="2.2s" repeatCount="indefinite" begin="0.6s"/></circle>
+          <!-- B6 wide far right -->
+          <rect x="446" y="222" width="36" height="70" rx="1" fill="#111a35" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.28"/>
+          <rect x="450" y="227" width="5" height="3" fill="#00d4ff" opacity="0.14"/>
+          <rect x="460" y="227" width="5" height="3" fill="#00d4ff" opacity="0.18"/>
+          <rect x="470" y="227" width="5" height="3" fill="#00d4ff" opacity="0.12"/>
+          <rect x="450" y="235" width="5" height="3" fill="#7b5cff" opacity="0.16"/>
+          <rect x="460" y="243" width="5" height="3" fill="#00d4ff" opacity="0.20"/>
+          <!-- B7 slim far right -->
+          <rect x="489" y="205" width="18" height="87" rx="1" fill="#111a35" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.32"/>
+          <rect x="492" y="210" width="5" height="3" fill="#00d4ff" opacity="0.16"/>
+          <rect x="500" y="218" width="5" height="3" fill="#00d4ff" opacity="0.22"/>
+          <rect x="492" y="226" width="5" height="3" fill="#7b5cff" opacity="0.14"/>
+
+          <!-- Bridge structure -->
+          <!-- Deck -->
+          <rect x="30" y="265" width="265" height="5" rx="2" fill="#1a2744" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.5"/>
+          <!-- Left tower -->
+          <rect x="108" y="205" width="11" height="67" rx="1.5" fill="#1a2744" stroke="#00d4ff" stroke-width="1.2" stroke-opacity="0.75"/>
+          <!-- Right tower -->
+          <rect x="218" y="205" width="11" height="67" rx="1.5" fill="#1a2744" stroke="#00d4ff" stroke-width="1.2" stroke-opacity="0.75"/>
+          <!-- Left tower cables -->
+          <line x1="113" y1="208" x2="40"  y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="113" y1="208" x2="70"  y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="113" y1="208" x2="100" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="113" y1="208" x2="135" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="113" y1="208" x2="165" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <!-- Right tower cables -->
+          <line x1="223" y1="208" x2="170" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="223" y1="208" x2="200" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="223" y1="208" x2="223" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="223" y1="208" x2="255" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+          <line x1="223" y1="208" x2="285" y2="265" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.3"/>
+
+          <!-- Road (foreground) -->
+          <rect x="0" y="318" width="520" height="28" rx="0" fill="#0d1728"/>
+          <rect x="0" y="318" width="520" height="28" fill="none" stroke="#00d4ff" stroke-width="0.5" stroke-opacity="0.18"/>
+          <!-- Lane markings -->
+          <path d="M 0 332 L 520 332" stroke="#00d4ff" stroke-width="0.6" stroke-opacity="0.15" stroke-dasharray="14 10"/>
+          <!-- Cars silhouettes -->
+          <rect x="60"  y="321" width="24" height="10" rx="2" fill="#1a2744" stroke="#00d4ff" stroke-width="0.5" stroke-opacity="0.4"/>
+          <rect x="63"  y="319" width="16" height="4"  rx="1" fill="#1a2744" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.3"/>
+          <rect x="180" y="322" width="20" height="9"  rx="2" fill="#1a2744" stroke="#00d4ff" stroke-width="0.5" stroke-opacity="0.35"/>
+          <rect x="182" y="320" width="14" height="4"  rx="1" fill="#1a2744" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.25"/>
+          <rect x="350" y="321" width="28" height="10" rx="2" fill="#1a2744" stroke="#7b5cff" stroke-width="0.5" stroke-opacity="0.4"/>
+          <rect x="354" y="319" width="18" height="4"  rx="1" fill="#1a2744" stroke="#7b5cff" stroke-width="0.4" stroke-opacity="0.3"/>
+          <rect x="455" y="321" width="24" height="10" rx="2" fill="#1a2744" stroke="#00d4ff" stroke-width="0.5" stroke-opacity="0.4"/>
+          <rect x="458" y="319" width="16" height="4"  rx="1" fill="#1a2744" stroke="#00d4ff" stroke-width="0.4" stroke-opacity="0.3"/>
+
+          <!-- Train (elevated rail) -->
+          <line x1="270" y1="290" x2="520" y2="288" stroke="#1a2744" stroke-width="4"/>
+          <line x1="270" y1="290" x2="520" y2="288" stroke="#00d4ff" stroke-width="0.8" stroke-opacity="0.35"/>
+          <!-- Train body -->
+          <rect x="290" y="280" width="90" height="13" rx="4" fill="#111a35" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.7"/>
+          <path d="M 290 281 L 282 286 L 290 292" fill="#111a35" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.7"/>
+          <!-- Train windows (wagon 1) -->
+          <rect x="300" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.22"/>
+          <rect x="312" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.16"/>
+          <rect x="324" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.20"/>
+          <rect x="336" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.14"/>
+          <rect x="348" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.18"/>
+          <!-- Second wagon (coupled) -->
+          <rect x="383" y="280" width="85" height="13" rx="4" fill="#111a35" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.55"/>
+          <!-- Train windows (wagon 2) -->
+          <rect x="393" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.18"/>
+          <rect x="405" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.22"/>
+          <rect x="417" y="283" width="8" height="5" rx="1" fill="#7b5cff" opacity="0.16"/>
+          <rect x="429" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.14"/>
+          <rect x="441" y="283" width="8" height="5" rx="1" fill="#00d4ff" opacity="0.20"/>
+
+          <!-- Ground strip -->
+          <rect x="0" y="346" width="520" height="44" fill="#080e1c"/>
+
+          <!-- ── SENSOR NODES ── -->
+          <!-- N1: Bridge left tower -->
+          <circle cx="113" cy="207" r="8" fill="#0a0f1e" stroke="#00d4ff" stroke-width="1.8" filter="url(#sg)"/>
+          <circle cx="113" cy="207" r="4" fill="#00d4ff" opacity="0.9"><animate attributeName="r" values="4;9;4" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite"/></circle>
+
+          <!-- N2: Bridge deck centre -->
+          <circle cx="163" cy="263" r="8" fill="#0a0f1e" stroke="#00d4ff" stroke-width="1.8" filter="url(#sg)"/>
+          <circle cx="163" cy="263" r="4" fill="#00d4ff" opacity="0.9"><animate attributeName="r" values="4;9;4" dur="2.4s" repeatCount="indefinite" begin="0.6s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="2.4s" repeatCount="indefinite" begin="0.6s"/></circle>
+
+          <!-- N3: Road -->
+          <circle cx="260" cy="328" r="8" fill="#0a0f1e" stroke="#00d4ff" stroke-width="1.8" filter="url(#sg)"/>
+          <circle cx="260" cy="328" r="4" fill="#00d4ff" opacity="0.9"><animate attributeName="r" values="4;9;4" dur="1.9s" repeatCount="indefinite" begin="0.3s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="1.9s" repeatCount="indefinite" begin="0.3s"/></circle>
+
+          <!-- N4: Train -->
+          <circle cx="380" cy="279" r="8" fill="#0a0f1e" stroke="#7b5cff" stroke-width="1.8" filter="url(#sg)"/>
+          <circle cx="380" cy="279" r="4" fill="#7b5cff" opacity="0.9"><animate attributeName="r" values="4;9;4" dur="2.2s" repeatCount="indefinite" begin="1s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="2.2s" repeatCount="indefinite" begin="1s"/></circle>
+
+          <!-- N5: Tall building top -->
+          <circle cx="333" cy="194" r="8" fill="#0a0f1e" stroke="#7b5cff" stroke-width="1.8" filter="url(#sg)"/>
+          <circle cx="333" cy="194" r="4" fill="#7b5cff" opacity="0.9"><animate attributeName="r" values="4;9;4" dur="2.6s" repeatCount="indefinite" begin="0.8s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="2.6s" repeatCount="indefinite" begin="0.8s"/></circle>
+
+          <!-- N6: Cloud / top-centre -->
+          <circle cx="230" cy="130" r="8" fill="#0a0f1e" stroke="#00d4ff" stroke-width="1.8" filter="url(#sg)"/>
+          <circle cx="230" cy="130" r="4" fill="#00d4ff" opacity="0.9"><animate attributeName="r" values="4;9;4" dur="2.1s" repeatCount="indefinite" begin="0.2s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="2.1s" repeatCount="indefinite" begin="0.2s"/></circle>
+
+          <!-- N7: Top of building B4 -->
+          <circle cx="397" cy="218" r="8" fill="#0a0f1e" stroke="#00d4ff" stroke-width="1.8" filter="url(#sg)"/>
+          <circle cx="397" cy="218" r="4" fill="#00d4ff" opacity="0.9"><animate attributeName="r" values="4;9;4" dur="2.3s" repeatCount="indefinite" begin="0.5s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="2.3s" repeatCount="indefinite" begin="0.5s"/></circle>
+
+          <!-- N8: Vehicle sensor — car right road -->
+          <circle cx="466" cy="319" r="7" fill="#0a0f1e" stroke="#00d4ff" stroke-width="1.5" filter="url(#sg)"/>
+          <circle cx="466" cy="319" r="3" fill="#00d4ff" opacity="0.9"><animate attributeName="r" values="3;7;3" dur="1.8s" repeatCount="indefinite" begin="0.4s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="1.8s" repeatCount="indefinite" begin="0.4s"/></circle>
+
+          <!-- N9: Vehicle sensor — car mid road (V2V) -->
+          <circle cx="363" cy="319" r="7" fill="#0a0f1e" stroke="#7b5cff" stroke-width="1.5" filter="url(#sg)"/>
+          <circle cx="363" cy="319" r="3" fill="#7b5cff" opacity="0.9"><animate attributeName="r" values="3;7;3" dur="2s" repeatCount="indefinite" begin="0.9s"/><animate attributeName="opacity" values="0.9;0;0.9" dur="2s" repeatCount="indefinite" begin="0.9s"/></circle>
+
+          <!-- ── ARC CONNECTIONS ── -->
+          <path id="sa1" d="M 113,207 Q 165,155 230,130" fill="none" stroke="#00d4ff" stroke-width="1.1" stroke-opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.3s" repeatCount="indefinite"/></path>
+          <path id="sa2" d="M 113,207 Q 135,235 163,263" fill="none" stroke="#00d4ff" stroke-width="1.1" stroke-opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.0s" repeatCount="indefinite"/></path>
+          <path id="sa3" d="M 163,263 Q 205,300 260,328" fill="none" stroke="#00d4ff" stroke-width="1.1" stroke-opacity="0.45" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.2s" repeatCount="indefinite"/></path>
+          <path id="sa4" d="M 230,130 Q 275,155 333,194" fill="none" stroke="#7b5cff" stroke-width="1.1" stroke-opacity="0.45" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.5s" repeatCount="indefinite"/></path>
+          <path id="sa5" d="M 333,194 Q 355,235 380,279" fill="none" stroke="#7b5cff" stroke-width="1.1" stroke-opacity="0.45" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.4s" repeatCount="indefinite"/></path>
+          <path id="sa6" d="M 260,328 Q 315,300 380,279" fill="none" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.35" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.7s" repeatCount="indefinite"/></path>
+          <!-- sa7: N6 cloud → N7 building B4 top -->
+          <path id="sa7" d="M 230,130 Q 320,105 397,218" fill="none" stroke="#00d4ff" stroke-width="0.8" stroke-opacity="0.45" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="2s" repeatCount="indefinite"/></path>
+          <!-- sa8: N7 building → N5 building (building-to-building) -->
+          <path id="sa8" d="M 397,218 Q 368,205 333,194" fill="none" stroke="#00d4ff" stroke-width="0.8" stroke-opacity="0.35" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.8s" repeatCount="indefinite" begin="0.4s"/></path>
+          <!-- sa9: N7 building → N8 vehicle (V2I infrastructure-to-vehicle) -->
+          <path id="sa9" d="M 397,218 Q 430,268 466,319" fill="none" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.4" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.6s" repeatCount="indefinite" begin="0.8s"/></path>
+          <!-- sa10: N8 car → N9 car (V2V vehicle-to-vehicle) -->
+          <path id="sa10" d="M 466,319 Q 415,310 363,319" fill="none" stroke="#7b5cff" stroke-width="0.9" stroke-opacity="0.45" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.4s" repeatCount="indefinite" begin="0.3s"/></path>
+          <!-- sa11: N9 car → N3 road sensor (V2I) -->
+          <path id="sa11" d="M 363,319 Q 310,318 260,328" fill="none" stroke="#7b5cff" stroke-width="0.9" stroke-opacity="0.4" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.5s" repeatCount="indefinite" begin="0.6s"/></path>
+
+          <!-- Traveling dots -->
+          <circle r="3" fill="#00d4ff" filter="url(#sg)"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath href="#sa1"/></animateMotion></circle>
+          <circle r="3" fill="#00d4ff" filter="url(#sg)"><animateMotion dur="1.3s" repeatCount="indefinite" begin="0.4s"><mpath href="#sa2"/></animateMotion></circle>
+          <circle r="3" fill="#00d4ff" filter="url(#sg)"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.9s"><mpath href="#sa3"/></animateMotion></circle>
+          <circle r="3" fill="#7b5cff" filter="url(#sg)"><animateMotion dur="2s" repeatCount="indefinite" begin="0.2s"><mpath href="#sa4"/></animateMotion></circle>
+          <circle r="3" fill="#7b5cff" filter="url(#sg)"><animateMotion dur="1.9s" repeatCount="indefinite" begin="0.7s"><mpath href="#sa5"/></animateMotion></circle>
+          <circle r="2.5" fill="#00d4ff" filter="url(#sg)"><animateMotion dur="2.2s" repeatCount="indefinite" begin="1.1s"><mpath href="#sa6"/></animateMotion></circle>
+          <circle r="2.5" fill="#00d4ff" filter="url(#sg)"><animateMotion dur="2.5s" repeatCount="indefinite" begin="0.5s"><mpath href="#sa7"/></animateMotion></circle>
+          <circle r="2.5" fill="#00d4ff" filter="url(#sg)"><animateMotion dur="2s" repeatCount="indefinite" begin="1.3s"><mpath href="#sa8"/></animateMotion></circle>
+          <circle r="2.5" fill="#00d4ff" filter="url(#sg)"><animateMotion dur="2s" repeatCount="indefinite" begin="0.8s"><mpath href="#sa9"/></animateMotion></circle>
+          <circle r="2.5" fill="#7b5cff" filter="url(#sg)"><animateMotion dur="1.7s" repeatCount="indefinite" begin="0.3s"><mpath href="#sa10"/></animateMotion></circle>
+          <circle r="2.5" fill="#7b5cff" filter="url(#sg)"><animateMotion dur="1.8s" repeatCount="indefinite" begin="1s"><mpath href="#sa11"/></animateMotion></circle>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ABOUT -->
+  <section class="block about">
+    <div class="label">About</div>
+    <div class="about-inner">
+      <div class="about-text">
+        <h2>Engineering meets machine learning at the edge of infrastructure.</h2>
+        <p>
+          I work at the intersection of <strong>civil engineering</strong> and <strong>artificial intelligence</strong>,
+          building data-driven systems that monitor the health of large-scale infrastructure &mdash;
+          from highway bridges to railway lines and offshore wind turbines.
+        </p>
+        <p>
+          My PhD focused on probability-based intelligent structural health monitoring using metaheuristic
+          optimisation, surrogate modelling and big-data techniques. Today I deploy intelligent SHM pipelines
+          that move from raw vibration signals to actionable structural diagnosis.
+        </p>
+      </div>
+      <div class="avatar-wrap">
+        <div class="avatar-glow"></div>
+        <div class="avatar-ring"></div>
+        <img class="avatar" src="photo.jpg" alt="Dr. Ramin Ghiasi"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHM CONCEPT VISUALIZATION -->
+  <section class="block">
+    <div class="label">How SHM works</div>
+    <h2>From vibration to verdict &mdash; the SHM pipeline.</h2>
+
+    <div class="shm-viz">
+      <div class="viz-label">// structural health monitoring &middot; conceptual overview</div>
+
+      <!-- SVG Bridge Diagram -->
+      <div class="shm-svg-wrap">
+        <svg viewBox="0 0 900 230" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Bridge deck -->
+          <rect x="55" y="132" width="575" height="6" rx="2" fill="#1a2744" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.45"/>
+
+          <!-- Left tower -->
+          <rect x="152" y="50" width="12" height="90" rx="2" fill="#1a2744" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <!-- Right tower -->
+          <rect x="448" y="50" width="12" height="90" rx="2" fill="#1a2744" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.8"/>
+
+          <!-- Left cable fans -->
+          <line x1="158" y1="54" x2="75"  y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="158" y1="54" x2="110" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="158" y1="54" x2="158" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="158" y1="54" x2="205" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="158" y1="54" x2="255" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="158" y1="54" x2="305" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+
+          <!-- Right cable fans -->
+          <line x1="454" y1="54" x2="630" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="454" y1="54" x2="590" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="454" y1="54" x2="550" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="454" y1="54" x2="505" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="454" y1="54" x2="454" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="454" y1="54" x2="400" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+          <line x1="454" y1="54" x2="355" y2="132" stroke="#00d4ff" stroke-width="0.9" stroke-opacity="0.3"/>
+
+          <!-- Sensor S1 -->
+          <circle cx="158" cy="135" r="7" fill="#0a0f1e" stroke="#00d4ff" stroke-width="2" filter="url(#glow)"/>
+          <circle cx="158" cy="135" r="3" fill="#00d4ff">
+            <animate attributeName="r" values="3;7;3" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Sensor S2 -->
+          <circle cx="285" cy="135" r="7" fill="#0a0f1e" stroke="#00d4ff" stroke-width="2" filter="url(#glow)"/>
+          <circle cx="285" cy="135" r="3" fill="#00d4ff">
+            <animate attributeName="r" values="3;7;3" dur="2.4s" repeatCount="indefinite" begin="0.6s"/>
+            <animate attributeName="opacity" values="1;0;1" dur="2.4s" repeatCount="indefinite" begin="0.6s"/>
+          </circle>
+
+          <!-- Sensor S3 (anomaly) -->
+          <circle cx="390" cy="135" r="7" fill="#0a0f1e" stroke="#ff6b6b" stroke-width="2" filter="url(#glow)"/>
+          <circle cx="390" cy="135" r="3" fill="#ff6b6b">
+            <animate attributeName="r" values="3;8;3" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+            <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+          </circle>
+
+          <!-- Sensor S4 -->
+          <circle cx="454" cy="135" r="7" fill="#0a0f1e" stroke="#00d4ff" stroke-width="2" filter="url(#glow)"/>
+          <circle cx="454" cy="135" r="3" fill="#00d4ff">
+            <animate attributeName="r" values="3;7;3" dur="2.2s" repeatCount="indefinite" begin="1s"/>
+            <animate attributeName="opacity" values="1;0;1" dur="2.2s" repeatCount="indefinite" begin="1s"/>
+          </circle>
+
+          <!-- Sensor S5 -->
+          <circle cx="560" cy="135" r="7" fill="#0a0f1e" stroke="#00d4ff" stroke-width="2" filter="url(#glow)"/>
+          <circle cx="560" cy="135" r="3" fill="#00d4ff">
+            <animate attributeName="r" values="3;7;3" dur="2.7s" repeatCount="indefinite" begin="0.9s"/>
+            <animate attributeName="opacity" values="1;0;1" dur="2.7s" repeatCount="indefinite" begin="0.9s"/>
+          </circle>
+
+          <!-- Normal signal waveform -->
+          <path d="M 60 170 Q 85 158 110 170 Q 135 182 160 170 Q 185 158 210 170 Q 235 183 260 165 Q 280 155 300 170 Q 320 185 345 168 Q 365 155 385 170"
+                fill="none" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.55" stroke-dasharray="5 3">
+            <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.2s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Anomaly spike at S3 -->
+          <path d="M 385 170 L 390 126 L 396 170" fill="none" stroke="#ff6b6b" stroke-width="2.5" filter="url(#glow)">
+            <animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite"/>
+          </path>
+          <text x="395" y="121" fill="#ff6b6b" font-size="10" font-family="JetBrains Mono" opacity="0.9">
+            ⚠
+            <animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite"/>
+          </text>
+
+          <!-- Continuing waveform -->
+          <path d="M 396 170 Q 420 183 445 168 Q 468 155 490 170 Q 510 183 535 170 Q 558 158 580 170 Q 600 183 625 170"
+                fill="none" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.55" stroke-dasharray="5 3">
+            <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1.2s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- Data flow line to AI box -->
+          <line x1="645" y1="135" x2="718" y2="110" stroke="#00d4ff" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="5 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="-18" dur="0.9s" repeatCount="indefinite"/>
+          </line>
+
+          <!-- AI box -->
+          <rect x="718" y="68" width="152" height="88" rx="14" fill="#111a35" stroke="#00d4ff" stroke-width="1.5" stroke-opacity="0.9" filter="url(#glow)"/>
+
+          <!-- Neural net dots inside AI box -->
+          <circle cx="745" cy="92" r="3" fill="#00d4ff" opacity="0.7"/>
+          <circle cx="770" cy="92" r="3" fill="#00d4ff" opacity="0.7"/>
+          <circle cx="795" cy="92" r="3" fill="#00d4ff" opacity="0.7"/>
+          <circle cx="820" cy="92" r="3" fill="#00d4ff" opacity="0.7845"/>
+          <circle cx="845" cy="92" r="3" fill="#00d4ff" opacity="0.7"/>
+
+          <circle cx="757" cy="112" r="3" fill="#7b5cff" opacity="0.8"/>
+          <circle cx="794" cy="112" r="3" fill="#7b5cff" opacity="0.8"/>
+          <circle cx="832" cy="112" r="3" fill="#7b5cff" opacity="0.8"/>
+
+          <line x1="745" y1="92" x2="757" y2="112" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.35"/>
+          <line x1="770" y1="92" x2="757" y2="112" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.35"/>
+          <line x1="795" y1="92" x2="794" y2="112" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.35"/>
+          <line x1="820" y1="92" x2="832" y2="112" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.35"/>
+          <line x1="845" y1="92" x2="832" y2="112" stroke="#00d4ff" stroke-width="0.7" stroke-opacity="0.35"/>
+
+          <text x="794" y="134" text-anchor="middle" fill="#00d4ff" font-size="11" font-family="JetBrains Mono" letter-spacing="1" opacity="0.9">AI / ML</text>
+
+          <!-- Output verdict -->
+          <text x="794" y="172" text-anchor="middle" fill="#4ade80" font-size="12" font-family="JetBrains Mono" letter-spacing="1" filter="url(#glow)">⚠ ANOMALY</text>
+          <text x="794" y="188" text-anchor="middle" fill="#8b97b5" font-size="9" font-family="JetBrains Mono">S3 &middot; pier mid-span</text>
+
+          <!-- Section labels -->
+          <text x="307" y="215" text-anchor="middle" fill="#8b97b5" font-size="10" font-family="JetBrains Mono" letter-spacing="1">SENSOR NETWORK</text>
+          <text x="794" y="215" text-anchor="middle" fill="#8b97b5" font-size="10" font-family="JetBrains Mono" letter-spacing="1">AI DIAGNOSIS</text>
+        </svg>
+      </div>
+
+      <!-- Pipeline steps -->
+      <div class="flow-pipeline">
+        <div class="flow-step">
+          <div class="step-icon">🌉</div>
+          <div class="step-name">Infrastructure</div>
+          <div class="step-sub">Bridge · Rail<br/>Wind Turbine</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-icon">📡</div>
+          <div class="step-name">Sensors</div>
+          <div class="step-sub">Accelerometers<br/>Strain gauges</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-icon">〰️</div>
+          <div class="step-name">Signal Processing</div>
+          <div class="step-sub">Wavelet · FFT<br/>Feature extraction</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-icon">🧠</div>
+          <div class="step-name">AI Engine</div>
+          <div class="step-sub">SVM · Deep learning<br/>Bayesian methods</div>
+        </div>
+        <div class="flow-step">
+          <div class="step-icon">🎯</div>
+          <div class="step-name">Diagnosis</div>
+          <div class="step-sub">Damage detection<br/>Anomaly alert</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH FOCUS -->
+  <section class="block">
+    <div class="label">Research focus</div>
+    <h2>Where I spend my compute cycles.</h2>
+    <div class="research-grid">
+      <div class="chip">
+        <span class="num">01 / SHM</span>
+        <div class="title">Structural Health Monitoring of Civil Infrastructure</div>
+      </div>
+      <div class="chip">
+        <span class="num">02 / AI</span>
+        <div class="title">Artificial Intelligence in Engineering</div>
+      </div>
+      <div class="chip">
+        <span class="num">03 / SIGNAL</span>
+        <div class="title">Intelligent Signal Processing</div>
+      </div>
+      <div class="chip">
+        <span class="num">04 / DATA</span>
+        <div class="title">Data Mining &amp; Big Data Analytics</div>
+      </div>
+      <div class="chip">
+        <span class="num">05 / MATH</span>
+        <div class="title">Applied Mathematics &amp; Surrogate Methods</div>
+      </div>
+      <div class="chip">
+        <span class="num">06 / WAVE</span>
+        <div class="title">Wavelet &amp; Curvelet Transforms</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELECTED PAPERS -->
+  <section class="block">
+    <div class="label">Publications</div>
+    <h2>Selected papers &amp; most-cited work.</h2>
+    <div class="papers-list">
+      <a class="paper-card" href="https://www.researchgate.net/publication/301220137_A_machine-learning_approach_for_structural_damage_detection_using_least_square_support_vector_machine_based_on_a_new_combinational_kernel_function" target="_blank" rel="noopener">
+        <div class="cite-badge"><span class="cite-n">212</span><span class="cite-l">cited</span></div>
+        <div class="paper-info">
+          <div class="p-title">A machine-learning approach for structural damage detection using least square support vector machine based on a new combinational kernel function</div>
+          <div class="p-meta">Structural Health Monitoring &nbsp;&middot;&nbsp; 2016</div>
+        </div>
+        <div class="paper-arrow">→</div>
+      </a>
+      <a class="paper-card" href="https://www.techscience.com/sdhm/v15n1/41900" target="_blank" rel="noopener">
+        <div class="cite-badge"><span class="cite-n">141</span><span class="cite-l">cited</span></div>
+        <div class="paper-info">
+          <div class="p-title">Comparative analysis of wavelet transform for time-frequency analysis and transient localization in structural health monitoring</div>
+          <div class="p-meta">Structural Durability &amp; Health Monitoring &nbsp;&middot;&nbsp; 2021</div>
+        </div>
+        <div class="paper-arrow">→</div>
+      </a>
+      <a class="paper-card" href="https://www.sciencedirect.com/science/article/abs/pii/S0965997817301412" target="_blank" rel="noopener">
+        <div class="cite-badge"><span class="cite-n">106</span><span class="cite-l">cited</span></div>
+        <div class="paper-info">
+          <div class="p-title">Comparative studies of metamodeling and AI-based techniques in damage detection of structures</div>
+          <div class="p-meta">Advances in Engineering Software &nbsp;&middot;&nbsp; 2018</div>
+        </div>
+        <div class="paper-arrow">→</div>
+      </a>
+      <a class="paper-card" href="https://www.sciencedirect.com/science/article/pii/S0888327023006933" target="_blank" rel="noopener">
+        <div class="cite-badge"><span class="cite-n">103</span><span class="cite-l">cited</span></div>
+        <div class="paper-info">
+          <div class="p-title">From model-driven to data-driven: A review of hysteresis modeling in structural and mechanical systems</div>
+          <div class="p-meta">Mechanical Systems and Signal Processing &nbsp;&middot;&nbsp; 2023</div>
+        </div>
+        <div class="paper-arrow">→</div>
+      </a>
+      <a class="paper-card" href="https://www.sciencedirect.com/science/article/pii/S0952197624003257" target="_blank" rel="noopener">
+        <div class="cite-badge"><span class="cite-n">88</span><span class="cite-l">cited</span></div>
+        <div class="paper-info">
+          <div class="p-title">An unsupervised anomaly detection framework for onboard monitoring of railway track geometrical defects using one-class support vector machine</div>
+          <div class="p-meta">Engineering Applications of Artificial Intelligence &nbsp;&middot;&nbsp; 2024</div>
+        </div>
+        <div class="paper-arrow">→</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- TALKS & MEDIA -->
+  <section class="block">
+    <div class="label">Talks &amp; Media</div>
+    <h2>Lectures, interviews &amp; conference talks.</h2>
+    <div class="videos-grid">
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe
+            src="https://www.youtube.com/embed/ATn2KldJYE4"
+            title="Ramin Ghiasi — ETH Zurich Lecture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="video-meta">
+          <div class="vid-tag">// ETH Zurich</div>
+          <div class="vid-title">Lecture at ETH Zurich</div>
+          <div class="vid-sub">Structural Health Monitoring &amp; AI in Civil Engineering</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe
+            src="https://www.youtube.com/embed/Fthp97-f4CA"
+            title="Dr Ramin Ghiasi — Postdoctoral Researcher Profile"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="video-meta">
+          <div class="vid-tag">// UCD Research</div>
+          <div class="vid-title">Postdoctoral Researcher Profile</div>
+          <div class="vid-sub">University College Dublin — School of Civil Engineering</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-embed">
+          <iframe
+            src="https://www.youtube.com/embed/-AlzpjEefdM"
+            title="From Sensors to Decisions: AI in Civil Infrastructure — IStructE Lunchtime Lecture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="video-meta">
+          <div class="vid-tag">// IStructE NI YMG</div>
+          <div class="vid-title">From Sensors to Decisions: AI in Civil Infrastructure</div>
+          <div class="vid-sub">IStructE Northern Ireland &mdash; Lunchtime Lecture</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="block">
+    <div class="label">Trajectory</div>
+    <h2>From doctorate to deployment.</h2>
+    <div class="timeline">
+      <div class="step">
+        <div class="when">2023 &mdash; Present</div>
+        <div class="where">Roughan &amp; O'Donovan &mdash; ITS Group, Dublin</div>
+        <div class="what">Research Engineer building intelligent monitoring pipelines for road and rail infrastructure.</div>
+      </div>
+      <div class="step">
+        <div class="when">Postdoc</div>
+        <div class="where">University College Dublin (UCD)</div>
+        <div class="what">School of Civil, Structural and Environmental Engineering &mdash; AI-driven SHM on the Di-Rail project.</div>
+      </div>
+      <div class="step">
+        <div class="when">2019 &mdash; 2022</div>
+        <div class="where">Southeast University, China</div>
+        <div class="what">Adjunct Research Assistant Professor &mdash; bridge monitoring and machine learning.</div>
+      </div>
+      <div class="step">
+        <div class="when">2018 / 2019</div>
+        <div class="where">PhD &mdash; University of Sistan &amp; Baluchestan</div>
+        <div class="what">Probability-based intelligent SHM via metaheuristics, big data, and surrogate modelling.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block">
+    <div class="label">Contact</div>
+    <div class="contact-card">
+      <h3>Let&rsquo;s build something that listens.</h3>
+      <p>Open to research collaboration, consulting, and PhD/postdoc co-supervision in SHM and AI.</p>
+      <a class="btn" href="mailto:rghiasi.s@gmail.com">
+        rghiasi.s@gmail.com <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>&copy; 2026 Ramin Ghiasi, PhD</div>
+  <div>Dublin &middot; Ireland</div>
+</footer>
+
+</body>
+</html>
